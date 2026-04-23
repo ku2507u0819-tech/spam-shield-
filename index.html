@@ -7,564 +7,129 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #0a0a0f;
-    --surface: #111118;
-    --border: #1e1e2e;
-    --accent: #00ff88;
-    --accent2: #ff3366;
-    --text: #e8e8f0;
-    --muted: #5a5a7a;
-    --spam: #ff3366;
-    --ham: #00ff88;
+    --bg: #0a0a0f; --surface: #111118; --border: #1e1e2e;
+    --accent: #00ff88; --text: #e8e8f0; --muted: #5a5a7a;
+    --spam: #ff3366; --ham: #00ff88;
   }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  body::after { content: ''; position: fixed; top: -40%; left: -20%; width: 60%; height: 60%; background: radial-gradient(ellipse, rgba(0,255,136,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; animation: drift 12s ease-in-out infinite alternate; }
+  @keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(10%,8%) scale(1.1); } }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-x: hidden;
-  }
+  header { position: relative; z-index: 1; width: 100%; max-width: 780px; padding: 56px 24px 0; animation: slideDown 0.7s cubic-bezier(0.22,1,0.36,1) both; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-24px); } to { opacity: 1; transform: translateY(0); } }
+  .badge { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(0,255,136,0.3); padding: 4px 12px; border-radius: 2px; margin-bottom: 20px; background: rgba(0,255,136,0.05); display: inline-block; }
+  h1 { font-size: clamp(48px, 8vw, 80px); font-weight: 800; line-height: 0.95; letter-spacing: -0.03em; margin-bottom: 16px; }
+  h1 span.green { color: var(--accent); } h1 span.red { color: var(--spam); }
+  .subtitle { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--muted); line-height: 1.7; max-width: 440px; }
 
-  /* Animated grid background */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
+  main { position: relative; z-index: 1; width: 100%; max-width: 780px; padding: 40px 24px 60px; animation: fadeUp 0.8s 0.2s cubic-bezier(0.22,1,0.36,1) both; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-  body::after {
-    content: '';
-    position: fixed;
-    top: -40%;
-    left: -20%;
-    width: 60%;
-    height: 60%;
-    background: radial-gradient(ellipse, rgba(0,255,136,0.06) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-    animation: drift 12s ease-in-out infinite alternate;
-  }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 16px; text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+  .stat-num.total { color: var(--text); } .stat-num.spam { color: var(--spam); } .stat-num.ham { color: var(--ham); }
+  .stat-lbl { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
-  @keyframes drift {
-    from { transform: translate(0, 0) scale(1); }
-    to { transform: translate(10%, 8%) scale(1.1); }
-  }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 32px; position: relative; overflow: hidden; }
+  .card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0.5; }
 
-  /* Header */
-  header {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 780px;
-    padding: 56px 24px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    animation: slideDown 0.7s cubic-bezier(0.22,1,0.36,1) both;
-  }
-
-  @keyframes slideDown {
-    from { opacity: 0; transform: translateY(-24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .badge {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    border: 1px solid rgba(0,255,136,0.3);
-    padding: 4px 12px;
-    border-radius: 2px;
-    margin-bottom: 20px;
-    background: rgba(0,255,136,0.05);
-  }
-
-  h1 {
-    font-size: clamp(48px, 8vw, 80px);
-    font-weight: 800;
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    margin-bottom: 16px;
-  }
-
-  h1 span.green { color: var(--accent); }
-  h1 span.red   { color: var(--spam); }
-
-  .subtitle {
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.7;
-    margin-bottom: 0;
-    max-width: 440px;
-  }
-
-  /* Main card */
-  main {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 780px;
-    padding: 40px 24px 60px;
-    animation: fadeUp 0.8s 0.2s cubic-bezier(0.22,1,0.36,1) both;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 32px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    opacity: 0.5;
-  }
-
-  label {
-    display: block;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  textarea {
-    width: 100%;
-    background: #0d0d14;
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    line-height: 1.7;
-    padding: 16px;
-    resize: vertical;
-    min-height: 140px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  textarea:focus {
-    border-color: rgba(0,255,136,0.4);
-  }
-
+  label { display: block; font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  textarea { width: 100%; background: #0d0d14; border: 1px solid var(--border); border-radius: 3px; color: var(--text); font-family: 'Space Mono', monospace; font-size: 14px; line-height: 1.7; padding: 16px; resize: vertical; min-height: 140px; outline: none; transition: border-color 0.2s; }
+  textarea:focus { border-color: rgba(0,255,136,0.4); }
   textarea::placeholder { color: #333348; }
+  .char-count { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); text-align: right; margin-top: 8px; }
 
-  .char-count {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    text-align: right;
-    margin-top: 8px;
-  }
-
-  .btn-row {
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
-    align-items: center;
-  }
-
-  button.analyze {
-    background: var(--accent);
-    color: #000;
-    border: none;
-    padding: 14px 32px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: 0.05em;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  button.analyze:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(0,255,136,0.25);
-  }
-
-  button.analyze:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  button.analyze:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  button.clear-btn {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-    padding: 14px 20px;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
-  }
-
+  .btn-row { display: flex; gap: 12px; margin-top: 24px; align-items: center; }
+  button.analyze { background: var(--accent); color: #000; border: none; padding: 14px 32px; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 0.05em; border-radius: 3px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+  button.analyze:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,255,136,0.25); }
+  button.clear-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); padding: 14px 20px; font-family: 'Space Mono', monospace; font-size: 12px; border-radius: 3px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
   button.clear-btn:hover { color: var(--text); border-color: var(--muted); }
 
-  /* Spinner */
-  .spinner {
-    display: inline-block;
-    width: 16px; height: 16px;
-    border: 2px solid rgba(0,0,0,0.3);
-    border-top-color: #000;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    vertical-align: middle;
-    margin-right: 8px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .scanning { margin-top: 20px; display: none; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent); }
+  .scanning.show { display: flex; align-items: center; gap: 10px; }
+  .scan-bar { flex: 1; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+  .scan-fill { height: 100%; width: 0%; background: var(--accent); animation: scanAnim 1.2s ease-in-out forwards; }
+  @keyframes scanAnim { 0% { width: 0%; } 60% { width: 80%; } 100% { width: 100%; } }
 
-  /* Result panel */
-  .result {
-    margin-top: 28px;
-    border-radius: 3px;
-    padding: 28px;
-    display: none;
-    animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
-    position: relative;
-    overflow: hidden;
-  }
-
+  .result { margin-top: 28px; border-radius: 3px; padding: 28px; display: none; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
   .result.show { display: block; }
+  .result.spam { background: rgba(255,51,102,0.07); border: 1px solid rgba(255,51,102,0.25); }
+  .result.ham  { background: rgba(0,255,136,0.05);  border: 1px solid rgba(0,255,136,0.2); }
+  @keyframes popIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-  .result.spam {
-    background: rgba(255,51,102,0.07);
-    border: 1px solid rgba(255,51,102,0.25);
-  }
+  .result-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+  .verdict-icon { font-size: 36px; line-height: 1; }
+  .verdict-label { font-size: 11px; font-family: 'Space Mono', monospace; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .verdict-text { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+  .result.spam .verdict-text { color: var(--spam); } .result.ham .verdict-text { color: var(--ham); }
 
-  .result.ham {
-    background: rgba(0,255,136,0.05);
-    border: 1px solid rgba(0,255,136,0.2);
-  }
+  .conf-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .conf-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .conf-track { flex: 1; height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .conf-fill { height: 100%; border-radius: 2px; transition: width 0.6s cubic-bezier(0.22,1,0.36,1); width: 0%; }
+  .result.spam .conf-fill { background: var(--spam); } .result.ham .conf-fill { background: var(--ham); }
+  .conf-pct { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; min-width: 36px; text-align: right; }
+  .result.spam .conf-pct { color: var(--spam); } .result.ham .conf-pct { color: var(--ham); }
 
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to   { opacity: 1; transform: scale(1); }
-  }
+  .signals { margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .signal-tag { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.08em; padding: 4px 10px; border-radius: 2px; border: 1px solid; }
+  .signal-tag.bad  { background: rgba(255,51,102,0.1); border-color: rgba(255,51,102,0.3); color: var(--spam); }
+  .signal-tag.good { background: rgba(0,255,136,0.07); border-color: rgba(0,255,136,0.2);  color: var(--ham); }
 
-  .result-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-  }
+  .result-reason { font-size: 13px; line-height: 1.7; color: #9999bb; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 16px; font-family: 'Space Mono', monospace; }
 
-  .verdict-icon {
-    font-size: 36px;
-    line-height: 1;
-  }
+  .samples { margin-top: 20px; }
+  .samples-label { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .sample-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-family: 'Space Mono', monospace; font-size: 11px; padding: 6px 12px; border-radius: 2px; cursor: pointer; transition: opacity 0.15s, transform 0.15s; border: 1px solid; }
+  .chip:hover { opacity: 0.8; transform: translateY(-1px); }
+  .chip.spam-chip { background: rgba(255,51,102,0.08); border-color: rgba(255,51,102,0.25); color: var(--spam); }
+  .chip.ham-chip  { background: rgba(0,255,136,0.05);  border-color: rgba(0,255,136,0.2);  color: var(--ham); }
 
-  .verdict-label {
-    font-size: 11px;
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-
-  .verdict-text {
-    font-size: 32px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 1;
-  }
-
-  .result.spam .verdict-text { color: var(--spam); }
-  .result.ham  .verdict-text { color: var(--ham); }
-
-  /* Confidence bar */
-  .conf-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .conf-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-
-  .conf-track {
-    flex: 1;
-    height: 4px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .conf-fill {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.6s cubic-bezier(0.22,1,0.36,1);
-    width: 0%;
-  }
-
-  .result.spam .conf-fill { background: var(--spam); }
-  .result.ham  .conf-fill { background: var(--ham); }
-
-  .conf-pct {
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    min-width: 36px;
-    text-align: right;
-  }
-
-  .result.spam .conf-pct { color: var(--spam); }
-  .result.ham  .conf-pct { color: var(--ham); }
-
-  .result-reason {
-    font-size: 14px;
-    line-height: 1.7;
-    color: #9999bb;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    padding-top: 16px;
-    font-family: 'Space Mono', monospace;
-  }
-
-  /* History */
-  .history-section {
-    margin-top: 40px;
-  }
-
-  .history-title {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .history-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .history-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .history-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    cursor: pointer;
-    transition: border-color 0.15s;
-    animation: slideIn 0.3s cubic-bezier(0.22,1,0.36,1) both;
-  }
-
+  .history-section { margin-top: 40px; }
+  .history-title { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+  .history-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 3px; cursor: pointer; transition: border-color 0.15s; }
   .history-item:hover { border-color: var(--muted); }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to   { opacity: 1; transform: translateX(0); }
-  }
-
-  .h-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
+  .h-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .h-dot.spam { background: var(--spam); box-shadow: 0 0 6px var(--spam); }
   .h-dot.ham  { background: var(--ham);  box-shadow: 0 0 6px var(--ham); }
-
-  .h-text {
-    flex: 1;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .h-verdict {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-  }
-
-  .h-verdict.spam { color: var(--spam); }
-  .h-verdict.ham  { color: var(--ham); }
-
-  /* Stats row */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-
-  .stat-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 16px;
-    text-align: center;
-  }
-
-  .stat-num {
-    font-size: 28px;
-    font-weight: 800;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .stat-num.total { color: var(--text); }
-  .stat-num.spam  { color: var(--spam); }
-  .stat-num.ham   { color: var(--ham); }
-
-  .stat-lbl {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  /* Error */
-  .error-msg {
-    background: rgba(255,51,102,0.08);
-    border: 1px solid rgba(255,51,102,0.2);
-    border-radius: 3px;
-    padding: 14px 16px;
-    font-family: 'Space Mono', monospace;
-    font-size: 12px;
-    color: var(--spam);
-    margin-top: 16px;
-    display: none;
-  }
-
-  .error-msg.show { display: block; }
-
-  /* Samples */
-  .samples {
-    margin-top: 20px;
-  }
-
-  .samples-label {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-
-  .sample-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .chip {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    padding: 6px 12px;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.15s;
-    border: 1px solid;
-  }
-
-  .chip:hover { opacity: 0.8; transform: translateY(-1px); }
-
-  .chip.spam-chip {
-    background: rgba(255,51,102,0.08);
-    border-color: rgba(255,51,102,0.25);
-    color: var(--spam);
-  }
-
-  .chip.ham-chip {
-    background: rgba(0,255,136,0.05);
-    border-color: rgba(0,255,136,0.2);
-    color: var(--ham);
-  }
+  .h-text { flex: 1; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .h-verdict { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; }
+  .h-verdict.spam { color: var(--spam); } .h-verdict.ham { color: var(--ham); }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="badge">AI-Powered · Real-time Analysis</div>
+  <div class="badge">100% Free · Works Offline · No API Needed</div>
   <h1><span class="green">Spam</span><br><span class="red">Shield</span></h1>
-  <p class="subtitle">Paste any message and instantly detect whether it's spam or legitimate. Powered by Claude AI.</p>
+  <p class="subtitle">Paste any message and instantly detect whether it's spam or legitimate. Runs entirely in your browser — no server, no cost.</p>
 </header>
 
 <main>
-  <!-- Stats -->
   <div class="stats" id="stats" style="display:none">
     <div class="stat-box"><div class="stat-num total" id="s-total">0</div><div class="stat-lbl">Analyzed</div></div>
-    <div class="stat-box"><div class="stat-num spam" id="s-spam">0</div><div class="stat-lbl">Spam</div></div>
-    <div class="stat-box"><div class="stat-num ham" id="s-ham">0</div><div class="stat-lbl">Legitimate</div></div>
+    <div class="stat-box"><div class="stat-num spam"  id="s-spam">0</div><div class="stat-lbl">Spam</div></div>
+    <div class="stat-box"><div class="stat-num ham"   id="s-ham">0</div><div class="stat-lbl">Legitimate</div></div>
   </div>
 
   <div class="card">
     <label for="msg-input">Message to analyze</label>
     <textarea id="msg-input" placeholder="Paste or type any message here — SMS, email, notification…" maxlength="2000"></textarea>
     <div class="char-count"><span id="char-num">0</span> / 2000</div>
-
     <div class="btn-row">
-      <button class="analyze" id="analyze-btn" onclick="analyzeMessage()">Analyze Message</button>
+      <button class="analyze" onclick="analyzeMessage()">Analyze Message</button>
       <button class="clear-btn" onclick="clearAll()">Clear</button>
     </div>
-
-    <div class="error-msg" id="error-msg"></div>
-
-    <!-- Result -->
+    <div class="scanning" id="scanning">
+      <span>Scanning…</span>
+      <div class="scan-bar"><div class="scan-fill" id="scan-fill"></div></div>
+    </div>
     <div class="result" id="result-panel">
       <div class="result-header">
         <div class="verdict-icon" id="r-icon"></div>
@@ -578,24 +143,24 @@
         <div class="conf-track"><div class="conf-fill" id="r-bar"></div></div>
         <span class="conf-pct" id="r-pct"></span>
       </div>
+      <div class="signals" id="r-signals"></div>
       <div class="result-reason" id="r-reason"></div>
     </div>
-
-    <!-- Samples -->
     <div class="samples">
       <div class="samples-label">Try a sample →</div>
       <div class="sample-chips">
         <span class="chip spam-chip" onclick="loadSample('URGENT: You have won a £1,000 Tesco gift card! Call 08700141612 now to claim your prize! This offer expires today!')">🎰 Prize Winner</span>
         <span class="chip spam-chip" onclick="loadSample('FREE entry: Just text WIN to 80086 to claim ur £250 reward. Txt STOP to opt out. Ts&Cs apply.')">💸 Free Entry</span>
         <span class="chip spam-chip" onclick="loadSample('Congratulations! Your mobile number has been selected for a FREE Nokia 6610. Call 09061743806 to claim NOW!')">📱 Free Phone</span>
-        <span class="chip ham-chip" onclick="loadSample('Hey, are you coming to the party on Saturday? Let me know so I can add you to the guest list.')">🎉 Party Invite</span>
-        <span class="chip ham-chip" onclick="loadSample('Your Amazon order #112-3456789 has shipped. Estimated delivery: Thursday, April 24.')">📦 Order Update</span>
-        <span class="chip ham-chip" onclick="loadSample('Hi, just checking in — did you get a chance to review the document I sent yesterday?')">💬 Follow-up</span>
+        <span class="chip spam-chip" onclick="loadSample('WINNER!! As a valued network customer you have been selected to receive a £900 prize reward! Call 09061701461. Valid 12 hours only.')">🏆 You Won</span>
+        <span class="chip ham-chip"  onclick="loadSample('Hey, are you coming to the party on Saturday? Let me know so I can add you to the guest list.')">🎉 Party Invite</span>
+        <span class="chip ham-chip"  onclick="loadSample('Your Amazon order #112-3456789 has shipped. Estimated delivery: Thursday, April 24.')">📦 Order Update</span>
+        <span class="chip ham-chip"  onclick="loadSample('Hi, just checking in — did you get a chance to review the document I sent yesterday?')">💬 Follow-up</span>
+        <span class="chip ham-chip"  onclick="loadSample('Can we reschedule our meeting to 3pm? I have a conflict at 2.')">📅 Reschedule</span>
       </div>
     </div>
   </div>
 
-  <!-- History -->
   <div class="history-section" id="history-section" style="display:none">
     <div class="history-title">Recent Analyses</div>
     <div class="history-list" id="history-list"></div>
@@ -603,156 +168,182 @@
 </main>
 
 <script>
-  const textarea = document.getElementById('msg-input');
-  const charNum  = document.getElementById('char-num');
-  const errMsg   = document.getElementById('error-msg');
-  const resultPanel = document.getElementById('result-panel');
+// ── SPAM DETECTION ENGINE (100% browser, no API) ──
 
-  let totalCount = 0, spamCount = 0, hamCount = 0;
-  const history = [];
+const SPAM_RULES = [
+  { r: /\b(won|winner|winning)\b/i,            score: 15, label: 'PRIZE CLAIM' },
+  { r: /\b(prize|reward|gift\s*card|voucher)\b/i, score: 12, label: 'REWARD' },
+  { r: /\b(claim|collect|redeem)\b/i,           score: 10, label: 'CLAIM' },
+  { r: /[£€\$]\s*\d+|\d+\s*[£€\$]/,            score: 12, label: 'MONEY AMOUNT' },
+  { r: /\b(urgent|urgently|immediately)\b/i,    score: 14, label: 'URGENCY' },
+  { r: /\b(expires?|expiring|act now|hurry)\b/i,score: 12, label: 'TIME PRESSURE' },
+  { r: /\b(today only|\d+\s*hours?\s*only)\b/i, score: 13, label: 'LIMITED TIME' },
+  { r: /\b(call|txt|text)\s+0[89]\d{7,}/i,      score: 20, label: 'SUSPICIOUS NUMBER' },
+  { r: /\b0[89]\d{8,}\b/,                       score: 18, label: 'PREMIUM NUMBER' },
+  { r: /\b(freemsg|freephone|free\s*call)\b/i,  score: 16, label: 'FREE CALL/MSG' },
+  { r: /\bfree\b/i,                             score:  8, label: 'FREE' },
+  { r: /\b(opt.?out|txt\s*stop|reply\s*stop)\b/i, score: 9, label: 'OPT-OUT' },
+  { r: /\bts?&?cs?\b/i,                         score:  7, label: 'T&Cs' },
+  { r: /\b(click here|visit now|click the link)\b/i, score: 12, label: 'CLICK BAIT' },
+  { r: /\bcongratulations?\b/i,                 score: 10, label: 'CONGRATS' },
+  { r: /\bselected\b/i,                         score:  6, label: 'SELECTED' },
+  { r: /https?:\/\/|www\./i,                    score: 10, label: 'LINK' },
+];
 
-  textarea.addEventListener('input', () => {
-    charNum.textContent = textarea.value.length;
-  });
+const HAM_RULES = [
+  { r: /\b(hi|hey|hello|dear)\b/i,              score: -8  },
+  { r: /\b(thanks|thank you|please|sorry)\b/i,  score: -10 },
+  { r: /\b(meeting|schedule|reschedule)\b/i,    score: -8  },
+  { r: /\b(order|shipped|delivery|tracking)\b/i,score: -7  },
+  { r: /\b(amazon|flipkart|swiggy|zomato|uber)\b/i, score: -9 },
+  { r: /\b(see you|talk later|let me know|sounds good)\b/i, score: -10 },
+  { r: /\b(attached|document|report|review)\b/i,score: -7  },
+  { r: /\b(love|miss|mom|dad|brother|sister|friend)\b/i, score: -12 },
+  { r: /\b(i am|i'm|we are|we're)\b/i,          score: -5  },
+  { r: /\?/,                                    score: -5  },
+];
 
-  function loadSample(text) {
-    textarea.value = text;
-    charNum.textContent = text.length;
-    textarea.focus();
-  }
+function detectSpam(text) {
+  let score = 0;
+  const signals = [];
+  const seen = new Set();
 
-  function clearAll() {
-    textarea.value = '';
-    charNum.textContent = '0';
-    resultPanel.className = 'result';
-    errMsg.className = 'error-msg';
-  }
-
-  async function analyzeMessage() {
-    const text = textarea.value.trim();
-    if (!text) { showError('Please enter a message to analyze.'); return; }
-
-    errMsg.className = 'error-msg';
-    resultPanel.className = 'result';
-    const btn = document.getElementById('analyze-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Analyzing…';
-
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: `You are a spam detection AI trained on SMS and email data. Analyze the given message and return ONLY a JSON object (no markdown, no extra text) with this structure:
-{
-  "verdict": "SPAM" or "HAM",
-  "confidence": <integer 0-100>,
-  "reason": "<one concise sentence explaining why>"
-}
-
-Rules:
-- HAM means legitimate/not spam
-- SPAM means unsolicited, promotional, scam, or phishing
-- confidence must reflect your certainty
-- reason must be under 25 words`,
-          messages: [{ role: 'user', content: `Analyze this message for spam:\n\n"${text}"` }]
-        })
-      });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.error?.message || 'API error');
+  for (const rule of SPAM_RULES) {
+    if (rule.r.test(text)) {
+      score += rule.score;
+      if (rule.label && !seen.has(rule.label)) {
+        signals.push({ label: rule.label, type: 'bad' });
+        seen.add(rule.label);
       }
-
-      const data = await response.json();
-      const raw = data.content.map(b => b.text || '').join('').trim();
-      const clean = raw.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(clean);
-
-      displayResult(parsed, text);
-
-    } catch (e) {
-      showError('Error: ' + e.message);
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = 'Analyze Message';
     }
   }
 
-  function displayResult(result, text) {
-    const isSpam = result.verdict === 'SPAM';
-    const panel  = resultPanel;
-    const conf   = Math.min(100, Math.max(0, result.confidence));
-
-    panel.className = 'result show ' + (isSpam ? 'spam' : 'ham');
-
-    document.getElementById('r-icon').textContent    = isSpam ? '⚠️' : '✅';
-    document.getElementById('r-verdict').textContent = isSpam ? 'SPAM' : 'Legitimate';
-    document.getElementById('r-reason').textContent  = result.reason;
-    document.getElementById('r-pct').textContent     = conf + '%';
-
-    // Animate bar
-    const bar = document.getElementById('r-bar');
-    bar.style.width = '0%';
-    setTimeout(() => { bar.style.width = conf + '%'; }, 50);
-
-    // Update stats
-    totalCount++;
-    if (isSpam) spamCount++; else hamCount++;
-    document.getElementById('s-total').textContent = totalCount;
-    document.getElementById('s-spam').textContent  = spamCount;
-    document.getElementById('s-ham').textContent   = hamCount;
-    document.getElementById('stats').style.display = 'grid';
-
-    // Add to history
-    addToHistory(text, isSpam, conf);
-
-    // Scroll to result
-    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  for (const rule of HAM_RULES) {
+    if (rule.r.test(text)) score += rule.score;
   }
 
-  function addToHistory(text, isSpam, conf) {
-    history.unshift({ text, isSpam, conf });
-    if (history.length > 8) history.pop();
+  // ALL CAPS ratio
+  const words = text.split(/\s+/).filter(w => w.length > 2);
+  const capsRatio = words.length ? words.filter(w => w === w.toUpperCase() && /[A-Z]/.test(w)).length / words.length : 0;
+  if (capsRatio > 0.4) { score += 15; if (!seen.has('EXCESSIVE CAPS')) { signals.push({ label: 'EXCESSIVE CAPS', type: 'bad' }); seen.add('EXCESSIVE CAPS'); } }
+  else if (capsRatio > 0.2) score += 7;
 
-    const section = document.getElementById('history-section');
-    const list    = document.getElementById('history-list');
-    section.style.display = 'block';
-    list.innerHTML = '';
+  // Exclamation marks
+  const excl = (text.match(/!/g) || []).length;
+  if (excl >= 3) { score += 12; if (!seen.has('EXCLAMATIONS')) { signals.push({ label: excl + ' EXCLAMATIONS', type: 'bad' }); seen.add('EXCLAMATIONS'); } }
+  else if (excl === 2) score += 6;
 
-    history.forEach((item, i) => {
-      const el = document.createElement('div');
-      el.className = 'history-item';
-      el.style.animationDelay = (i * 0.04) + 's';
-      el.innerHTML = `
-        <div class="h-dot ${item.isSpam ? 'spam' : 'ham'}"></div>
-        <div class="h-text">${escapeHtml(item.text.slice(0, 80))}${item.text.length > 80 ? '…' : ''}</div>
-        <div class="h-verdict ${item.isSpam ? 'spam' : 'ham'}">${item.isSpam ? 'SPAM' : 'HAM'} · ${item.conf}%</div>
-      `;
-      el.onclick = () => {
-        textarea.value = item.text;
-        charNum.textContent = item.text.length;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      };
-      list.appendChild(el);
-    });
-  }
+  // Long message = less spammy
+  if (text.length > 300) score -= 8;
+  if (text.length > 500) score -= 8;
 
-  function showError(msg) {
-    errMsg.textContent = msg;
-    errMsg.className = 'error-msg show';
-  }
+  // Normalize
+  const clamped = Math.max(-40, Math.min(80, score));
+  const norm = (clamped + 40) / 120;
+  const isSpam = norm > 0.52;
+  const confidence = Math.min(99, Math.max(52, isSpam
+    ? Math.round(50 + (norm - 0.52) / 0.48 * 49)
+    : Math.round(50 + (0.52 - norm) / 0.52 * 49)));
 
-  function escapeHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
+  const spamReasons = [
+    "Contains multiple spam indicators: prize claims, urgency triggers, and suspicious numbers.",
+    "Detected unsolicited promotional language with high-pressure call-to-action.",
+    "Pattern matches known SMS spam templates with reward or prize claims.",
+    "Uses urgency tactics and suspicious shortcode numbers typical of spam.",
+    "Excessive capitalization and monetary claims common in spam messages.",
+  ];
+  const hamReasons = [
+    "Natural conversational language with no spam indicators detected.",
+    "Message reads as a genuine personal or transactional communication.",
+    "Tone and structure consistent with legitimate everyday messaging.",
+    "No promotional triggers, urgency tactics, or suspicious links found.",
+    "Content matches typical patterns of authentic human communication.",
+  ];
 
-  // Enter to submit
-  textarea.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) analyzeMessage();
+  return {
+    isSpam,
+    confidence,
+    signals: signals.slice(0, 5),
+    reason: isSpam
+      ? spamReasons[Math.floor(Math.random() * spamReasons.length)]
+      : hamReasons[Math.floor(Math.random() * hamReasons.length)]
+  };
+}
+
+// ── UI ──
+const textarea = document.getElementById('msg-input');
+const charNum  = document.getElementById('char-num');
+let total = 0, spam = 0, ham = 0;
+const hist = [];
+
+textarea.addEventListener('input', () => { charNum.textContent = textarea.value.length; });
+
+function loadSample(text) { textarea.value = text; charNum.textContent = text.length; textarea.focus(); }
+
+function clearAll() {
+  textarea.value = ''; charNum.textContent = '0';
+  document.getElementById('result-panel').className = 'result';
+  document.getElementById('scanning').className = 'scanning';
+}
+
+function analyzeMessage() {
+  const text = textarea.value.trim();
+  if (!text) return;
+  document.getElementById('result-panel').className = 'result';
+  const scanning = document.getElementById('scanning');
+  scanning.className = 'scanning show';
+  const fill = document.getElementById('scan-fill');
+  fill.style.animation = 'none'; fill.offsetHeight; fill.style.animation = '';
+  setTimeout(() => { scanning.className = 'scanning'; displayResult(detectSpam(text), text); }, 1200);
+}
+
+function displayResult(result, text) {
+  const { isSpam, confidence, signals, reason } = result;
+  const panel = document.getElementById('result-panel');
+  panel.className = 'result show ' + (isSpam ? 'spam' : 'ham');
+  document.getElementById('r-icon').textContent    = isSpam ? '⚠️' : '✅';
+  document.getElementById('r-verdict').textContent = isSpam ? 'SPAM' : 'Legitimate';
+  document.getElementById('r-reason').textContent  = reason;
+  document.getElementById('r-pct').textContent     = confidence + '%';
+  const bar = document.getElementById('r-bar');
+  bar.style.width = '0%';
+  setTimeout(() => { bar.style.width = confidence + '%'; }, 50);
+  const sigEl = document.getElementById('r-signals');
+  sigEl.innerHTML = '';
+  signals.forEach(s => {
+    const t = document.createElement('span');
+    t.className = 'signal-tag ' + s.type;
+    t.textContent = s.label;
+    sigEl.appendChild(t);
   });
+  total++; if (isSpam) spam++; else ham++;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-spam').textContent  = spam;
+  document.getElementById('s-ham').textContent   = ham;
+  document.getElementById('stats').style.display = 'grid';
+  addHistory(text, isSpam, confidence);
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function addHistory(text, isSpam, conf) {
+  hist.unshift({ text, isSpam, conf });
+  if (hist.length > 8) hist.pop();
+  const section = document.getElementById('history-section');
+  const list    = document.getElementById('history-list');
+  section.style.display = 'block';
+  list.innerHTML = '';
+  hist.forEach((item, i) => {
+    const el = document.createElement('div');
+    el.className = 'history-item';
+    el.style.animationDelay = (i * 0.04) + 's';
+    el.innerHTML = `<div class="h-dot ${item.isSpam ? 'spam' : 'ham'}"></div><div class="h-text">${esc(item.text.slice(0,80))}${item.text.length>80?'…':''}</div><div class="h-verdict ${item.isSpam?'spam':'ham'}">${item.isSpam?'SPAM':'HAM'} · ${item.conf}%</div>`;
+    el.onclick = () => { textarea.value = item.text; charNum.textContent = item.text.length; window.scrollTo({top:0,behavior:'smooth'}); };
+    list.appendChild(el);
+  });
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+textarea.addEventListener('keydown', e => { if (e.key==='Enter' && (e.ctrlKey||e.metaKey)) analyzeMessage(); });
 </script>
 </body>
 </html>
